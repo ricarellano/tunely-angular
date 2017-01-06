@@ -10,8 +10,12 @@ angular
   // ^ the first argument is a string naming the controller,
   // the second argument is a function that defines the capacities
   // of the controller.
+  AlbumsIndexController.$inject = ['$http'];
 
-function AlbumsIndexController () {
+
+
+
+function AlbumsIndexController ($http) {
   var vm = this;
   vm.newAlbum = {};
 
@@ -20,18 +24,33 @@ function AlbumsIndexController () {
       artistName: 'Morrissey'
   };
 
-  vm.albums = [
-    {
-      name: 'Coming Home',
-      artistName: 'Leon Bridges'
-    },
-    {
-      name: 'Are We There',
-      artistName: 'Sharon Van Etten'
-    },
-    {
-      name: 'The Queen is Dead',
-      artistName: 'The Smiths'
-    }
-  ];
+  $http({
+    method: 'GET',
+    url:'/api/albums'
+  }).then(function successCallback(response) {
+    console.log("success!");
+    vm.albums = response.data;
+    console.log(response);
+
+
+  }, function errorCallback(response) {
+    console.log('There was an error getting the data', response);
+  });
+
+
+vm.createAlbum = function () {
+  $http({
+    method: 'POST',
+    url: '/api/albums',
+    data: vm.newAlbum
+  }).then(function successCallback(response) {
+    vm.albums.push(response.data);
+     console.log(response.data);
+    // what is the structure of this repsonse?
+    // how do we add the response data to our albums array?
+  }, function errorCallback(response) {
+    console.log('There was an error posting the data', response);
+  });
+}
+
 }
